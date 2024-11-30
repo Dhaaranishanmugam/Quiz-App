@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    
+    <style>
+        body{
+             background-color: rgb(45, 67, 116); 
+        }
+        .app{
+            background:white;
+            width: 50%;
+            max-width: 500px;
+            margin:80px auto 0;
+            border-radius: 10px;
+            padding: 30px;
+        }
+        .app h1{
+            font-size:50px;
+            color: rgb(74, 67, 123);
+            font-weight: 600px; 
+            border-bottom: 3px solid rgb(74, 67, 123);
+            padding-bottom: 20px;
+        }
+        .quiz{
+            padding: 5px 0;
+        }
+        .quiz h3{
+            margin-top: -10px;
+            font-size:23px;
+            color:rgb(74, 67, 123);
+            font-weight: 600;
+        }
+        .btn{
+            background: white;
+            color:rgb(74, 67, 123);
+            font-weight: 500;
+            width:100%;
+            border:1px solid rgb(74, 67, 123);
+            padding:10px;
+            margin: 10px 0;
+            text-align: left;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn:hover:not([disabled]){
+            background: rgb(74, 67, 123);
+            color:white;
+        }
+        .btn:disabled{
+            cursor: no-drop;
+        }
+        #next-btn{
+            background: rgb(74, 67, 123);
+            color:white;
+            font-weight: 600;
+            font-size: 25px;
+            width:150px;
+            border:0;
+            padding: 6px;
+            margin:6px auto 0;
+            border-radius: 4px;
+            cursor: pointer;
+            display: none;
+        }
+        .correct{
+            background: rgb(53, 147, 53);
+            color: white;
+        }
+        .incorrect{
+            background: rgb(242, 65, 65);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <h1>Quiz</h1>
+        <div class="quiz">
+            <h3 id="question">Question</h3>
+            <div id="answer-buttons">
+                <button class="btn">Answer1</button>
+                <button class="btn">Answer2</button>
+                <button class="btn">Answer3</button>
+                <button class="btn">Answer4</button>
+            </div>
+            <button id="next-btn">Next</button>
+        </div>
+    </div>
+    <script>
+        const questions = [
+            {
+                question: "What is the pH value of the human body?",
+                answers: [
+                    { text: "9.2 to 9.8", correct: false },
+                    { text: "7.0 to 7.8", correct: true },
+                    { text: "6.1 to 6.3", correct: false },
+                    { text: "5.4 to 5.6", correct: false },
+                ]
+            },
+            {
+                question: "Which of the following are called Key Industrial animals ?",
+                answers: [
+                    { text: "Producers", correct: false },
+                    { text: "Tertiary consumers", correct: false },
+                    { text: "Primary consumers", correct: true},
+                    { text: "None of these", correct: false },
+                ]
+            },
+            {
+                question: "Which of the given devices is used for counting blood cells?",
+                answers: [
+                    { text: "Hmelethometer", correct: false },
+                    { text: "Spyscometer", correct: false },
+                    { text: "Hemocytometer", correct: true },
+                    { text: "Hamosytometer", correct: false },
+                ]
+            },
+
+            {
+                question: "Which of the given compounds is used to make fireproof clothing?",
+                answers: [
+                    { text: "Aluminum chloride", correct: false },
+                    { text: "Aluminum Sulphate", correct: true },
+                    { text: "Magnesium Chloride", correct: false },
+                    { text: "Magnesium Sulphate", correct: false },
+                ]
+            },
+
+            {
+                question: "The driving force of an ecosystem is",
+                answers: [
+                    { text: "Carbon Mono oxide", correct: false },
+                    { text: "Biogas", correct: false },
+                    { text: "Solar Energy", correct: true},
+                    { text: "Carbon dioxide", correct: false },
+                ]
+            },
+
+            {
+                question: " Salt is obtained from sea water through which process.",
+                answers: [
+                    { text: "Adsorption", correct: false },
+                    { text: "Sublimation", correct: false },
+                    { text: "Absorption", correct: false},
+                    { text: "Evaporation", correct: true },
+                ]
+            },
+
+
+            {
+                question: "Where is India’s Silicon Valley located? ",
+                answers: [
+                    { text: "Bangalore", correct: true },
+                    { text: "Mumbai", correct: false },
+                    { text: "Delhi", correct: false},
+                    { text: "Odisha", correct: false},
+                ]
+            },
+        ];
+
+        const questionElement = document.getElementById("question");
+        const answerButtons = document.getElementById("answer-buttons");
+        const nextButton = document.getElementById("next-btn");
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function start() 
+        {
+            currentQuestionIndex = 0;
+            score = 0;
+            nextButton.innerHTML = "Next";
+            showQuestion();
+        }
+
+        function showQuestion() 
+        {
+            resetState();
+            const currentQuestion = questions[currentQuestionIndex];
+            const questionNo = currentQuestionIndex + 1;
+            questionElement.innerHTML = questionNo + " . " + currentQuestion.question;
+
+            
+            currentQuestion.answers.forEach(answer => {
+                const button = document.createElement("button");
+                button.innerHTML = answer.text;
+                button.classList.add("btn");
+                answerButtons.appendChild(button);
+                
+                if(answer.correct){
+                    button.dataset.correct=answer.correct;
+                }
+
+                button.addEventListener("click",selectAnswer);
+            });
+        }
+
+        function resetState()
+        {
+            nextButton.style.display="none";
+            while(answerButtons.firstChild){
+                answerButtons.removeChild(answerButtons.firstChild);
+            }
+        }
+
+        function selectAnswer(e)
+        {
+            const selectedBtn=e.target;
+            const isCorrect =  selectedBtn.dataset.correct==="true";
+
+            if(isCorrect){
+                selectedBtn.classList.add("correct");
+                score++;
+
+            }else{
+                selectedBtn.classList.add("incorrect");
+            }
+
+                Array.from(answerButtons.children).forEach(button=>{
+                    
+                    if(button.dataset.correct==="true"){
+                            button.classList.add("correct");
+                    }
+                    
+                    button.disabled="true";
+                });
+
+                nextButton.style.display="block";
+        }
+
+
+        function showScore(){
+                    resetState();
+                    questionElement.innerHTML=`You scored ${score} out of ${questions.length}!`;
+                    nextButton.innerHTML="PlayAgain";
+                    nextButton.style.display="block";
+        }
+
+        function handleNextButton(){
+            currentQuestionIndex++;
+            if(currentQuestionIndex<questions.length){
+                showQuestion();
+            }
+            else{
+                showScore();
+            }
+        }
+        nextButton.addEventListener("click",()=>{
+            if(currentQuestionIndex<questions.length){
+                handleNextButton();
+            }
+            else{
+                start();
+            }
+    });
+        start();
+    </script>
+</body>
+</html>
